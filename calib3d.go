@@ -149,6 +149,18 @@ func EstimateNewCameraMatrixForUndistortRectify(k, d Mat, imgSize image.Point, r
 	return OpenCVResult(C.Fisheye_EstimateNewCameraMatrixForUndistortRectify(k.Ptr(), d.Ptr(), imgSz, r.Ptr(), p.Ptr(), C.double(balance), newSz, C.double(fovScale)))
 }
 
+// FisheyeInitUndistortRectifyMap computes joint undistortion and rectification transformation for use by remap, according to the fisheye camera model.
+//
+// For further details, please see:
+// https://docs.opencv.org/master/db/d58/group__calib3d__fisheye.html#ga0d37b45f780b32f63ed19c21aa9fd333
+func FisheyeInitUndistortRectifyMap(k, d, r, p Mat, size image.Point, m1type int, map1, map2 Mat) error {
+	sz := C.struct_Size{
+		width:  C.int(size.X),
+		height: C.int(size.Y),
+	}
+	return OpenCVResult(C.Fisheye_InitUndistortRectifyMap(k.Ptr(), d.Ptr(), r.Ptr(), p.Ptr(), sz, C.int(m1type), map1.Ptr(), map2.Ptr()))
+}
+
 // InitUndistortRectifyMap computes the joint undistortion and rectification transformation and represents the result in the form of maps for remap
 //
 // For further details, please see:

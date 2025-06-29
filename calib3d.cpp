@@ -60,6 +60,16 @@ OpenCVResult Fisheye_EstimateNewCameraMatrixForUndistortRectify(Mat k, Mat d, Si
     }
 }
 
+OpenCVResult Fisheye_InitUndistortRectifyMap(Mat k, Mat d, Mat r, Mat p, Size size, int m1type, Mat map1, Mat map2) {
+    try {
+        cv::Size sz(size.width, size.height);
+        cv::fisheye::initUndistortRectifyMap(*k, *d, *r, *p, sz, m1type, *map1, *map2);
+        return successResult();
+    } catch(const cv::Exception& e) {
+        return errorResult(e.code, e.what());
+    }
+}
+
 OpenCVResult InitUndistortRectifyMap(Mat cameraMatrix,Mat distCoeffs,Mat r,Mat newCameraMatrix,Size size,int m1type,Mat map1,Mat map2) {
     try {
         cv::Size sz(size.width, size.height);

@@ -231,6 +231,77 @@ func TestFisheyeUndistorImageWithParams(t *testing.T) {
 	}
 }
 
+func TestFisheyeInitUndistortRectifyMap(t *testing.T) {
+	img := IMRead("images/distortion.jpg", IMReadUnchanged) // placeholder image
+	if img.Empty() {
+		t.Error("Invalid read of Mat test")
+		return
+	}
+	defer img.Close()
+
+	dest := NewMat()
+	defer dest.Close()
+
+	k := NewMatWithSize(3, 3, MatTypeCV64F)
+	defer k.Close()
+
+	k.SetDoubleAt(0, 0, 689.21)
+	k.SetDoubleAt(0, 1, 0)
+	k.SetDoubleAt(0, 2, 1295.56)
+
+	k.SetDoubleAt(1, 0, 0)
+	k.SetDoubleAt(1, 1, 690.48)
+	k.SetDoubleAt(1, 2, 942.17)
+
+	k.SetDoubleAt(2, 0, 0)
+	k.SetDoubleAt(2, 1, 0)
+	k.SetDoubleAt(2, 2, 1)
+
+	d := NewMatWithSize(1, 4, MatTypeCV64F)
+	defer d.Close()
+
+	d.SetDoubleAt(0, 0, -3.65584802e-01)
+	d.SetDoubleAt(0, 1, 1.41555815e-01)
+	d.SetDoubleAt(0, 2, -2.62985819e-03)
+	d.SetDoubleAt(0, 3, 2.05841873e-04)
+	d.SetDoubleAt(0, 4, -2.35021914e-02)
+
+	r := Eye(3, 3, MatTypeCV64F)
+	defer r.Close()
+
+	kNew := NewMat()
+	defer kNew.Close()
+
+	imgSize := image.Point{X: img.Cols(), Y: img.Rows()}
+	newSize := imgSize // placeholder
+	balance := 0.0     // placeholder
+	fovScale := 1.0    // placeholder
+
+	err := EstimateNewCameraMatrixForUndistortRectify(k, d, imgSize, r, &kNew, balance, newSize, fovScale)
+	if err != nil || kNew.Empty() {
+		t.Error("Failed to estimate new camera matrix for fisheye undistort/rectify")
+		return
+	}
+
+	mapx := NewMat()
+	defer mapx.Close()
+	mapy := NewMat()
+	defer mapy.Close()
+
+	m1type := 5 // CV_32FC1
+	err = FisheyeInitUndistortRectifyMap(k, d, r, kNew, imgSize, m1type, mapx, mapy)
+	if err != nil {
+		t.Error("FisheyeInitUndistortRectifyMap failed")
+		return
+	}
+
+	Remap(img, &dest, &mapx, &mapy, InterpolationDefault, BorderConstant, color.RGBA{0, 0, 0, 0})
+	flg := IMWrite("images/distortion-fisheye-correct.jpg", dest) // placeholder output
+	if !flg {
+		t.Error("IMWrite failed")
+	}
+}
+
 func TestInitUndistortRectifyMap(t *testing.T) {
 	img := IMRead("images/distortion.jpg", IMReadUnchanged)
 	if img.Empty() {

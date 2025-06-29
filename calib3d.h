@@ -18,6 +18,7 @@ OpenCVResult Fisheye_UndistortImage(Mat distorted, Mat undistorted, Mat k, Mat d
 OpenCVResult Fisheye_UndistortImageWithParams(Mat distorted, Mat undistorted, Mat k, Mat d, Mat knew, Size size);
 OpenCVResult Fisheye_UndistortPoints(Mat distorted, Mat undistorted, Mat k, Mat d, Mat R, Mat P);
 OpenCVResult Fisheye_EstimateNewCameraMatrixForUndistortRectify(Mat k, Mat d, Size imgSize, Mat r, Mat p, double balance, Size newSize, double fovScale);
+OpenCVResult Fisheye_InitUndistortRectifyMap(Mat k, Mat d, Mat r, Mat p, Size size, int m1type, Mat map1, Mat map2);
 
 OpenCVResult InitUndistortRectifyMap(Mat cameraMatrix,Mat distCoeffs,Mat r,Mat newCameraMatrix,Size size,int m1type,Mat map1,Mat map2);
 Mat GetOptimalNewCameraMatrixWithParams(Mat cameraMatrix,Mat distCoeffs,Size size,double alpha,Size newImgSize,Rect* validPixROI,bool centerPrincipalPoint);
